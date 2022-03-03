@@ -1,4 +1,6 @@
 package com.lyubaevda.httpapi.models
 
+import kotlinx.serialization.EncodeDefault
+
 @kotlinx.serialization.Serializable
-data class Product(val name: String, val description: String)
+class Product(@EncodeDefault(EncodeDefault.Mode.NEVER) var id: String? = null, val name: String, val description: String)

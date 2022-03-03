@@ -29,7 +29,7 @@ fun Route.productRouting() {
                     "No product with id $id",
                     status = HttpStatusCode.NotFound
                 )
-            call.respond(Pair(id, product))
+            call.respond(product)
         }
 
         post {
@@ -47,15 +47,15 @@ fun Route.productRouting() {
             val product = call.receive<Product>()
             ProductList.updateProduct(id, product) ?: return@put call.respondText(
                 "No product with id $id",
-                status = HttpStatusCode.NotModified
+                status = HttpStatusCode.BadRequest
             )
-            call.respond(Pair(id, product))
+            call.respond(ProductList.getProduct(id)!!)
         }
 
         delete("{id}") {
             val id = call.parameters["id"] ?: return@delete call.respond(HttpStatusCode.BadRequest)
             if (ProductList.deleteProduct(id) != null) {
-                call.respondText("Customer removed correctly", status = HttpStatusCode.Accepted)
+                call.respondText("Product removed correctly", status = HttpStatusCode.Accepted)
             } else {
                 call.respondText("Not Found", status = HttpStatusCode.NotFound)
             }

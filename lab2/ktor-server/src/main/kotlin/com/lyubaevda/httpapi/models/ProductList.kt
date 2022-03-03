@@ -8,7 +8,7 @@ object ProductList {
 
     private val productMap = ConcurrentHashMap<String, Product>()
 
-    fun getAllProducts(): List<Pair<String, Product>> = productMap.keys zip productMap.values.toList()
+    fun getAllProducts(): List<Product> = productMap.values.toList()
 
     fun getProduct(id: String): Product? = productMap[id]
 
@@ -17,12 +17,16 @@ object ProductList {
             val randomId = (1..STRING_LENGTH)
                 .map { kotlin.random.Random.nextInt(0, CHAR_POOL.size) }
                 .map(CHAR_POOL::get)
-                .joinToString("");
+                .joinToString("")
 
-            productMap.putIfAbsent(randomId, product) ?: return
+            productMap.putIfAbsent(randomId, product) ?: run {
+                product.id = randomId
+                return
+            }
         }
     }
 
-    fun updateProduct(id: String, product: Product): Product? = productMap.put(id, product)
+    fun updateProduct(id: String, product: Product): Product? = productMap.computeIfPresent(id) { _, _ -> product }
+
     fun deleteProduct(id: String): Product? = productMap.remove(id)
 }
