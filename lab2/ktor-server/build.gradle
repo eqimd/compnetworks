@@ -34,5 +34,5 @@ compileTestKotlin {
 }
 
 application {
-    mainClassName = 'MainKt'
+    mainClassName = 'com.lyubaevda.httpapi.ApplicationKt'
 }
