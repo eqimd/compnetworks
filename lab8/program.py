@@ -2,6 +2,7 @@ import socket
 
 from sys import argv
 from random import randint
+from checksums import calculate_checksum, verify_checksum
 
 
 IS_SERVER = True if input('Is it a server? (y/n): ') == 'y' else False
@@ -26,12 +27,17 @@ def get_new_recv(sock):
     while True:
         try:
             packet, addr = sock.recvfrom(1024)
+            chkcs, addr = sock.recvfrom(1024)
+            chkcs = int(chkcs.decode('utf-8'))
             if len(PACKETS) != 0 and packet == PACKETS[-1]:
                 print('Got same packet, resending ACK.')
                 send_bytes(sock,  addr, str(ACK_NO ^ 1).encode('utf-8'), add_ACK=False, wait_for_ack=False)
                 continue
             else:
                 print(f'Got packet with ACK {ACK_NO}')
+                print('Checksum:', chkcs)
+                if not verify_checksum(packet, chkcs):
+                    print('WARNING: Checksums does not match!')
                 PACKETS.append(packet)
                 send_bytes(sock,  addr, str(ACK_NO).encode('utf-8'), add_ACK=False, wait_for_ack=False)
                 print(f'Sent ACK {ACK_NO}')
@@ -47,10 +53,14 @@ def send_bytes(sock, addr, bytes, wait_for_ack=True, add_ACK=True):
     if add_ACK:
         bytes = f'ACK{str(ACK_NO)}'.encode('utf-8') + bytes
 
+    chcks = calculate_checksum(bytes)
+
     r = randint(1, 10)
     if r > 3:
         print('Sent packet:', bytes.decode('utf-8'))
         sock.sendto(bytes, addr)
+        print('Sent checksum:', chcks)
+        sock.sendto(str(chcks).encode('utf-8'), addr)
     else:
         print('...imitating packet lost...')
 
@@ -59,8 +69,9 @@ def send_bytes(sock, addr, bytes, wait_for_ack=True, add_ACK=True):
             try:
                 packet, addr = sock.recvfrom(1024)
             except socket.timeout:
-                print('Did not get ACK, resending packet.')
+                print('Did not get ACK, resending packet and checksum')
                 sock.sendto(bytes, addr)
+                sock.sendto(str(chcks).encode('utf-8'), addr)
                 continue
 
             if packet.decode('utf-8') == str(ACK_NO):
