@@ -31,6 +31,9 @@
 ---
 ## Ping
 Команда `python3 ping.py mit.edu`
+
 ![](screenshots/2_mit.png)
+
 Команда `python3 ping.py google.com`
+
 ![](screenshots/2_google.png)
