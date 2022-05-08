@@ -74,4 +74,4 @@ def route(dest, reqs, timeout):
 
 
 if __name__ == '__main__':
-    route('ya.ru', 5, 5)
+    route('yandex.ru', 2, 1)
