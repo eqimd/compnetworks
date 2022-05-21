@@ -47,9 +47,8 @@ class MyWindow:
         for i, host in enumerate(all_net_hosts):
             self.pbar['value'] = round((i + 1) / hosts_cnt * 100)
             ip = str(host)
-            print(ip)
-            packet = scapy.IP(dst=ip, ttl=20) / scapy.ICMP()
-            reply = scapy.sr1(packet, timeout=0.1)
+            packet = scapy.ARP(op='who-has', pdst=ip)
+            reply = scapy.sr1(packet, timeout=0.01, verbose=False)
             if reply is None:
                 continue
             try:
@@ -57,7 +56,7 @@ class MyWindow:
             except Exception:
                 hostname = ''
 
-            mac = scapy.getmacbyip(ip)
+            mac = reply.hwsrc
             self.ips_tree.insert('', 'end', text='1', values=(ip, mac, hostname))
 
 
