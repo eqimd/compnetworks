@@ -1,4 +1,4 @@
-## Сервер с REST: [видео](postman.mkv)
+## Сервер с REST: [видео](https://youtu.be/nCffFEiwB7k)
 ## Wireshark
 1. Source: d8:bb:c1:00:d9:bf
     ![](screenshots/1.png)
